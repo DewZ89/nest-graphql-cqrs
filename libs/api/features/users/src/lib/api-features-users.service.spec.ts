@@ -1,18 +1,18 @@
-import { Test } from '@nestjs/testing';
-import { ApiFeaturesUsersService } from './api-features-users.service';
+import { Test } from '@nestjs/testing'
+import { ApiFeaturesUsersService } from './api-features-users.service'
 
 describe('ApiFeaturesUsersService', () => {
-  let service: ApiFeaturesUsersService;
+  let service: ApiFeaturesUsersService
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [ApiFeaturesUsersService],
-    }).compile();
+    }).compile()
 
-    service = module.get(ApiFeaturesUsersService);
-  });
+    service = module.get(ApiFeaturesUsersService)
+  })
 
   it('should be defined', () => {
-    expect(service).toBeTruthy();
-  });
-});
+    expect(service).toBeTruthy()
+  })
+})
