@@ -1,2 +1,2 @@
-export * from './lib/api-features-users.service';
-export * from './lib/api-features-users.module';
+export * from './lib/users.service'
+export * from './lib/users.module'

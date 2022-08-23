@@ -3,6 +3,7 @@
   "version": 2,
   "projects": {
     "api": "apps/api",
-    "api-features-users": "libs/api/features/users"
+    "api-features-users": "libs/api/features/users",
+    "api-shared-prisma": "libs/api/shared/prisma"
   }
 }

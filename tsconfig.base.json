@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@blog/api/features/users": ["libs/api/features/users/src/index.ts"]
+      "@blog/api/features/users": ["libs/api/features/users/src/index.ts"],
+      "@blog/api/shared/prisma": ["libs/api/shared/prisma/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
