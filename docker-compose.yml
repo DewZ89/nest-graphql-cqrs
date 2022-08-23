@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  blog-db:
+    container_name: blog-db
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: blog
+    volumes:
+      - blog-db:/var/lib/postgresql/data
+
+volumes:
+  blog-db:
+
+networks:
+  default:
+    driver: bridge
+    name: blog
