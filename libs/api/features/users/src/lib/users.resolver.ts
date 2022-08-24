@@ -3,9 +3,14 @@ import { UserCreateInput } from './inputs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { CreateUserCommand } from './commands/contracts'
 import { UserInfo } from '../dtos'
-import { ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common'
-import { GetUsersQuery } from './queries/contracts'
-import { from, map, Observable } from 'rxjs'
+import {
+  ClassSerializerInterceptor,
+  NotFoundException,
+  ParseIntPipe,
+  UseInterceptors,
+} from '@nestjs/common'
+import { GetUserQuery, GetUsersQuery } from './queries/contracts'
+import { catchError, from, map, Observable, throwError } from 'rxjs'
 import { User } from '@prisma/client'
 
 @Resolver()
@@ -27,6 +32,16 @@ export class UsersResolver {
   getUsers(): Observable<UserInfo[]> {
     return from(this.queryBus.execute(new GetUsersQuery())).pipe(
       map((users: User[]) => users.map((user) => new UserInfo(user)))
+    )
+  }
+
+  @Query('user')
+  getUser(@Args('id', ParseIntPipe) id: number): Observable<UserInfo> {
+    return from(this.queryBus.execute(new GetUserQuery(id))).pipe(
+      map((user) => new UserInfo(user)),
+      catchError(() =>
+        throwError(() => new NotFoundException('No user match given id'))
+      )
     )
   }
 }

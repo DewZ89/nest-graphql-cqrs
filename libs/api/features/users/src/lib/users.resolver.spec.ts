@@ -5,6 +5,8 @@ import { UserCreateInput } from './inputs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { UserInfo } from '../dtos'
 import { User } from '@prisma/client'
+import { NotFoundError } from '@prisma/client/runtime'
+import { NotFoundException } from '@nestjs/common'
 
 const commandBusMock = mockDeep<CommandBus>() as DeepMockProxy<CommandBus>
 const queryBusMock = mockDeep<QueryBus>() as DeepMockProxy<QueryBus>
@@ -86,6 +88,39 @@ describe('UsersResolver', () => {
           })
         })
       })
+
+      describe('get user', () => {
+        it('should return user matching id', (done) => {
+          // Given
+          const id = 1
+          const expected = mockUsers.find((user) => user.id === id)
+          queryBusMock.execute.mockResolvedValue(expected)
+
+          // @hen..Then
+          resolver.getUser(id).subscribe((result) => {
+            expect(result).toEqual(expected)
+            done()
+          })
+        })
+
+        it('should throw NotFoundException if id is valid', (done) => {
+          // Given
+          const id = 1
+          queryBusMock.execute.mockRejectedValue(
+            new NotFoundError('Not found!')
+          )
+
+          // @hen..Then
+          resolver.getUser(id).subscribe({
+            error: (error) => {
+              expect(error).toBeInstanceOf(NotFoundException)
+              done()
+            },
+          })
+        })
+      })
     })
+
+    // describe('update user')
   })
 })
