@@ -13,12 +13,14 @@ const mockUserData = [
     name: 'John Doe',
     email: 'johndoe@example.com',
     id: 1,
+    password: 'secret',
     createdAt: new Date(),
   },
   {
     name: 'Jane Doe',
     email: 'janedoe@example.com',
     id: 2,
+    password: 'secret',
     createdAt: new Date(),
   },
 ] as User[]
@@ -48,6 +50,7 @@ describe('UsersService', () => {
       const data = {
         name: 'John Doe',
         email: 'johndoe@example.com',
+        password: 'secret',
       } as Prisma.UserCreateInput
 
       const expected = { ...data, id: 1, createdAt: new Date() } as User

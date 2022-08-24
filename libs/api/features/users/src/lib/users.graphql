@@ -1,9 +1,10 @@
 scalar DateTime
+scalar EmailAddress
 
 type User {
   id: ID!
   name: String!
-  email: String!
+  email: EmailAddress!
   createdAt: DateTime
   password: String!
 }
@@ -15,19 +16,21 @@ type UserInfo {
   createdAt: DateTime
 }
 
-input CreateUserInput {
+input UserCreateInput {
   name: String!
   email: String!
+  password: String!
 }
 
-input UpdateUserInput {
-  name: String!
-  email: String!
+input UserUpdateInput {
+  name: String
+  email: String
+  password: String
 }
 
 type Mutation {
-  createUser(data: CreateUserInput): UserInfo
-  updateUser(data: UpdateUserInput): UserInfo
+  createUser(data: UserCreateInput): UserInfo
+  updateUser(data: UserUpdateInput): UserInfo
 }
 
 type Query {
