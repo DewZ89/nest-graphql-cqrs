@@ -10,4 +10,8 @@ export class UsersService {
   create(data: Prisma.UserCreateInput): Observable<User> {
     return from(this.prismaService.user.create({ data }))
   }
+
+  findMany(where?: Prisma.UserWhereInput): Observable<User[]> {
+    return from(this.prismaService.user.findMany({ where }))
+  }
 }
