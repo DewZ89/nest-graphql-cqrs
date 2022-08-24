@@ -4,9 +4,13 @@ import { DeepMockProxy, mockDeep, mockReset } from 'jest-mock-extended'
 import { PrismaService } from '@blog/api/shared/prisma'
 import { Prisma, User } from '@prisma/client'
 import { NotFoundError } from '@prisma/client/runtime'
+import { PasswordService } from './password.service'
 
 const prismaServiceMock =
   mockDeep<PrismaService>() as DeepMockProxy<PrismaService>
+const passwordService =
+  mockDeep<PasswordService>() as DeepMockProxy<PasswordService>
+const passwordHash = '$argon2ipasswordhash'
 
 const mockUserData = [
   {
@@ -33,6 +37,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: PrismaService, useValue: prismaServiceMock },
+        { provide: PasswordService, useValue: passwordService },
       ],
     }).compile()
 
@@ -53,10 +58,22 @@ describe('UsersService', () => {
         password: 'secret',
       } as Prisma.UserCreateInput
 
-      const expected = { ...data, id: 1, createdAt: new Date() } as User
+      const expected = {
+        ...data,
+        id: 1,
+        createdAt: new Date(),
+        password: passwordHash,
+      } as User
       prismaServiceMock.user.create.mockResolvedValue(expected)
+      passwordService.hash.mockResolvedValue(passwordHash)
 
       await expect(service.create(data)).resolves.toEqual(expected)
+      await expect(prismaServiceMock.user.create).toHaveBeenCalledWith({
+        data: {
+          ...data,
+          password: passwordHash,
+        },
+      })
     })
   })
 
@@ -121,6 +138,33 @@ describe('UsersService', () => {
 
       // When..Then
       await expect(service.update(where, updateData)).resolves.toEqual(expected)
+    })
+
+    it('should update user password if provided', async () => {
+      // Given
+      const updateData: Prisma.UserUpdateInput = {
+        name: 'Jane Doe',
+        password: 'newpassword',
+      }
+      const where: Prisma.UserWhereUniqueInput = { id: 1 }
+      const expected: User = {
+        ...updateData,
+        id: 1,
+        createdAt: new Date(),
+        password: passwordHash,
+      } as User
+      prismaServiceMock.user.update.mockResolvedValue(expected)
+      passwordService.hash.mockResolvedValue(passwordHash)
+
+      // When..Then
+      await expect(service.update(where, updateData)).resolves.toEqual(expected)
+      await expect(prismaServiceMock.user.update).toHaveBeenCalledWith({
+        data: {
+          ...updateData,
+          password: passwordHash,
+        },
+        where,
+      })
     })
 
     it('should throw a NotFoundError exception if id invalid', async () => {
