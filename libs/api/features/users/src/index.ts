@@ -1,2 +1,2 @@
-export * from './lib/users.service'
+export * from './lib/services/users.service'
 export * from './lib/users.module'

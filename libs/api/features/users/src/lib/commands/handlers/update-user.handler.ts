@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UpdateUserCommand } from '../contracts'
-import { UsersService } from '../../users.service'
+import { UsersService } from '../../services/users.service'
 import { User } from '@prisma/client'
 
 @CommandHandler(UpdateUserCommand)

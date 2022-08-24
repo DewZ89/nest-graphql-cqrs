@@ -1,7 +1,7 @@
 import { CreateUserHandler } from './create-user.handler'
 import { Test, TestingModule } from '@nestjs/testing'
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended'
-import { UsersService } from '../../users.service'
+import { UsersService } from '../../services/users.service'
 import { User } from '@prisma/client'
 import { CreateUserCommand } from '../contracts'
 
