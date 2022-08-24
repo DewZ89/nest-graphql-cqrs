@@ -14,4 +14,15 @@ export class UsersService {
   findMany(where?: Prisma.UserWhereInput): Observable<User[]> {
     return from(this.prismaService.user.findMany({ where }))
   }
+
+  findUniqueOrThrow(where: Prisma.UserWhereUniqueInput): Observable<User> {
+    return from(this.prismaService.user.findUniqueOrThrow({ where }))
+  }
+
+  update(
+    where: Prisma.UserWhereUniqueInput,
+    data: Prisma.UserUpdateInput
+  ): Observable<User> {
+    return from(this.prismaService.user.update({ data, where }))
+  }
 }
