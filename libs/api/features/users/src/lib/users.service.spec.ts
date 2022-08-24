@@ -44,7 +44,7 @@ describe('UsersService', () => {
   })
 
   describe('create users', () => {
-    it('should create a user with valid data', (done) => {
+    it('should create a user with valid data', async () => {
       const data = {
         name: 'John Doe',
         email: 'johndoe@example.com',
@@ -53,68 +53,56 @@ describe('UsersService', () => {
       const expected = { ...data, id: 1, createdAt: new Date() } as User
       prismaServiceMock.user.create.mockResolvedValue(expected)
 
-      service.create(data).subscribe((result) => {
-        expect(result.name).toBe(expected.name)
-        expect(result.email).toBe(expected.email)
-        done()
-      })
+      await expect(service.create(data)).resolves.toEqual(expected)
     })
   })
 
   describe('get users', () => {
-    it('should get all users', (done) => {
+    it('should get all users', async () => {
+      // Given
       prismaServiceMock.user.findMany.mockResolvedValue(mockUserData)
-      service.findMany().subscribe((results) => {
-        expect(results).toBe(mockUserData)
-        done()
-      })
+
+      // When...Then
+      await expect(service.findMany()).resolves.toEqual(mockUserData)
     })
 
-    it('should get user matching criteria', (done) => {
+    it('should get user matching criteria', async () => {
+      // Given
       const where: Prisma.UserWhereInput = { id: 1 }
       const expected = mockUserData.filter((user) => user.id === where.id)
       prismaServiceMock.user.findMany.mockResolvedValue(expected)
-      service.findMany(where).subscribe((results) => {
-        expect(results).toBe(expected)
-        done()
-      })
+
+      // When...Then
+      await expect(service.findMany(where)).resolves.toEqual(expected)
     })
   })
 
   describe('get user', () => {
-    it('should get user matching id', (done) => {
+    it('should get user matching id', async () => {
       // Given
       const where: Prisma.UserWhereUniqueInput = { id: 1 }
       const expected = mockUserData.find((user) => user.id === where.id) as User
       prismaServiceMock.user.findUniqueOrThrow.mockResolvedValue(expected)
 
-      // When
-      service.findUniqueOrThrow(where).subscribe((result) => {
-        // Then
-        expect(result).toEqual(expected)
-        done()
-      })
+      // When..Then
+      await expect(service.findUniqueOrThrow(where)).resolves.toEqual(expected)
     })
 
-    it('should throw a NotFoundError exception if no user match id', (done) => {
+    it('should throw a NotFoundError exception if no user match id', async () => {
       // Given
       const where: Prisma.UserWhereUniqueInput = { id: 1 }
       prismaServiceMock.user.findUniqueOrThrow.mockRejectedValue(
         new NotFoundError('Not Found!')
       )
-      // When
-      service.findUniqueOrThrow(where).subscribe({
-        error: (error) => {
-          // Then
-          expect(error).toBeInstanceOf(NotFoundError)
-          done()
-        },
-      })
+      // When..Then
+      await expect(service.findUniqueOrThrow(where)).rejects.toBeInstanceOf(
+        NotFoundError
+      )
     })
   })
 
   describe('update user', () => {
-    it('should update user matching id', (done) => {
+    it('should update user matching id', async () => {
       // Given
       const updateData: Prisma.UserUpdateInput = {
         name: 'Jane Doe',
@@ -128,14 +116,11 @@ describe('UsersService', () => {
       } as User
       prismaServiceMock.user.update.mockResolvedValue(expected)
 
-      // When
-      service.update(where, updateData).subscribe((result) => {
-        expect(result).toEqual(expected)
-        done()
-      })
+      // When..Then
+      await expect(service.update(where, updateData)).resolves.toEqual(expected)
     })
 
-    it('should throw a NotFoundError exception if id invalid', (done) => {
+    it('should throw a NotFoundError exception if id invalid', async () => {
       // Given
       const updateData: Prisma.UserUpdateInput = {
         name: 'Jane Doe',
@@ -146,14 +131,10 @@ describe('UsersService', () => {
         new NotFoundError('Not Found!')
       )
 
-      // When
-      service.update(where, updateData).subscribe({
-        error: (error) => {
-          // Then
-          expect(error).toBeInstanceOf(NotFoundError)
-          done()
-        },
-      })
+      // When..Then
+      await expect(service.update(where, updateData)).rejects.toBeInstanceOf(
+        NotFoundError
+      )
     })
   })
 })
