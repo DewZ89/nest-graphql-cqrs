@@ -30,7 +30,7 @@ input UserUpdateInput {
 
 type Mutation {
   createUser(data: UserCreateInput): UserInfo
-  updateUser(data: UserUpdateInput): UserInfo
+  updateUser(id: ID!, data: UserUpdateInput): UserInfo
 }
 
 type Query {
