@@ -8,7 +8,7 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
   constructor(private readonly usersService: UsersService) {}
 
   execute(query: GetUserQuery): Promise<User> {
-    const { id } = query
-    return this.usersService.findUniqueOrThrow({ id })
+    const { where } = query
+    return this.usersService.findUniqueOrThrow(where)
   }
 }

@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+
 export class GetUserQuery {
-  constructor(public readonly id: number) {}
+  constructor(public readonly where: Prisma.UserWhereUniqueInput) {}
 }

@@ -38,7 +38,7 @@ export class UsersResolver {
 
   @Query('user')
   getUser(@Args('id', ParseIntPipe) id: number): Observable<UserInfo> {
-    return from(this.queryBus.execute(new GetUserQuery(id))).pipe(
+    return from(this.queryBus.execute(new GetUserQuery({ id }))).pipe(
       map((user) => new UserInfo(user)),
       catchError(() =>
         throwError(() => new NotFoundException('No user match given id'))
