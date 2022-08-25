@@ -3,10 +3,11 @@ import { UsersResolver } from './users.resolver'
 import { DeepMockProxy, mockDeep, mockReset } from 'jest-mock-extended'
 import { UserCreateInput } from './inputs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { UserInfo } from '../dtos'
+import { UserInfo } from './dtos'
 import { User } from '@prisma/client'
 import { NotFoundError } from '@prisma/client/runtime'
 import { NotFoundException } from '@nestjs/common'
+import { UserUpdateInput } from './inputs/user-update.input'
 
 const commandBusMock = mockDeep<CommandBus>() as DeepMockProxy<CommandBus>
 const queryBusMock = mockDeep<QueryBus>() as DeepMockProxy<QueryBus>
@@ -121,6 +122,49 @@ describe('UsersResolver', () => {
       })
     })
 
-    // describe('update user')
+    describe('update user', () => {
+      it('should update user matching id', (done) => {
+        // Given
+        const id = 1
+        const data: UserUpdateInput = {
+          name: 'Jane Doe',
+          email: 'new@example.com',
+        }
+        const expected = {
+          ...data,
+          createdAt: new Date(),
+          id,
+          password: '$argon2secret',
+        } as User
+        commandBusMock.execute.mockResolvedValue(expected)
+
+        // When..Then
+        resolver.updateUser(id, data).subscribe((result) => {
+          expect(result).toEqual(expected)
+          expect(commandBusMock.execute).toHaveBeenCalledTimes(1)
+          done()
+        })
+      })
+
+      it('should return NotFoundException if id invalid', (done) => {
+        // Given
+        const id = 1
+        const data: UserUpdateInput = {
+          password: 'secretpassword',
+        }
+
+        commandBusMock.execute.mockRejectedValue(
+          new NotFoundError('Not found!')
+        )
+
+        // When..Then
+        resolver.updateUser(id, data).subscribe({
+          error: (error) => {
+            expect(error).toBeInstanceOf(NotFoundException)
+            done()
+          },
+        })
+      })
+    })
   })
 })
