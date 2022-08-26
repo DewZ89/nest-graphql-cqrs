@@ -2,6 +2,10 @@ type Mutation {
   login(data: LoginInput): UserInfo
 }
 
+type Token {
+  accessToken: String!
+}
+
 input LoginInput {
   email: EmailAddress!
   password: String!

@@ -3,12 +3,15 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { LoginInput } from './inputs/login.input'
 import { GetUserQuery, ValidatePasswordCommand } from '@blog/api/features/users'
 import { User } from '@prisma/client'
+import { Token } from './dtos'
+import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
+    private readonly jwtService: JwtService
   ) {}
 
   async validateUser(data: LoginInput): Promise<User | null> {
@@ -24,6 +27,13 @@ export class AuthService {
         : null
     } catch (e) {
       return null
+    }
+  }
+
+  login(user: User): Token {
+    const payload = { email: user.email, sub: user.id }
+    return {
+      accessToken: this.jwtService.sign(payload),
     }
   }
 }

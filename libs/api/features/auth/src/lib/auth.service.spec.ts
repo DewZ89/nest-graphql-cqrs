@@ -5,9 +5,11 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { User } from '@prisma/client'
 import { LoginInput } from './inputs/login.input'
 import { NotFoundError } from '@prisma/client/runtime'
+import { JwtService } from '@nestjs/jwt'
 
 const commandBusMock = mockDeep<CommandBus>() as DeepMockProxy<CommandBus>
 const queryBusMock = mockDeep<QueryBus>() as DeepMockProxy<QueryBus>
+const jwtServiceMock = mockDeep<JwtService>() as DeepMockProxy<JwtService>
 
 describe('ApiFeaturesAuthService', () => {
   let service: AuthService
@@ -18,6 +20,7 @@ describe('ApiFeaturesAuthService', () => {
         AuthService,
         { provide: CommandBus, useValue: commandBusMock },
         { provide: QueryBus, useValue: queryBusMock },
+        { provide: JwtService, useValue: jwtServiceMock },
       ],
     }).compile()
 
@@ -77,6 +80,18 @@ describe('ApiFeaturesAuthService', () => {
 
       // When..Then
       await expect(service.validateUser(wrongCredentials)).resolves.toBeNull()
+    })
+  })
+
+  describe('login', () => {
+    it('should return access token', () => {
+      // Given
+      const user = { email: 'johndoe@example.com', id: 1 } as User
+      const expected = 'token'
+      jwtServiceMock.sign.mockReturnValue(expected)
+
+      // When..Then
+      expect(service.login(user)).toEqual({ accessToken: expected })
     })
   })
 })

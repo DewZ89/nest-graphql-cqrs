@@ -8,6 +8,7 @@ import {
 } from 'graphql-scalars'
 import { environment } from '../environments/environment'
 import { UsersModule } from '@blog/api/features/users'
+import { AuthModule } from '@blog/api/features/auth'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UsersModule } from '@blog/api/features/users'
       typeDefs: [...scalarsTypeDefs],
     }),
     UsersModule,
+    AuthModule,
   ],
   providers: [AppService],
 })
