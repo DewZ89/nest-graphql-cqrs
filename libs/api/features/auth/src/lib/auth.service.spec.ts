@@ -30,6 +30,7 @@ describe('ApiFeaturesAuthService', () => {
   beforeEach(() => {
     mockClear(commandBusMock)
     mockClear(queryBusMock)
+    mockClear(jwtServiceMock)
   })
 
   it('should be defined', () => {
