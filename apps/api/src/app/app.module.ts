@@ -23,7 +23,7 @@ import { PrismaModule } from '@blog/api/shared/prisma'
     }),
     PrismaModule,
     UsersModule,
-    AuthModule,
+    AuthModule.register({ jwtSecretKey: environment.jwtSecretKey }),
   ],
   providers: [AppService],
 })

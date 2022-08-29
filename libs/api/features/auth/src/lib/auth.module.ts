@@ -8,12 +8,28 @@ import { HANDLERS as COMMANDS_HANDLERS } from './commands'
 import { HANDLERS as QUERY_HANDLERS } from './queries'
 import { JwtModule } from '@nestjs/jwt'
 import { UsersModule } from '@blog/api/features/users'
+import { JwtStrategy } from './strategies/jwt.strategy'
+import {
+  ConfigurableModuleClass,
+  MODULE_OPTIONS_TOKEN,
+} from './auth.module-definition'
+import { AuthModuleOptions } from './types/auth-module-options.interface'
 
 @Module({
   imports: [
     CqrsModule,
     PassportModule,
-    JwtModule.register({ secret: 'exed', signOptions: { expiresIn: '30m' } }),
+    JwtModule.registerAsync({
+      useFactory: (options: AuthModuleOptions) => {
+        return {
+          secret: options.jwtSecretKey,
+          signOptions: {
+            expiresIn: '1h',
+          },
+        }
+      },
+      inject: [MODULE_OPTIONS_TOKEN],
+    }),
     UsersModule,
   ],
   providers: [
@@ -22,7 +38,8 @@ import { UsersModule } from '@blog/api/features/users'
     AuthResolver,
     ...COMMANDS_HANDLERS,
     ...QUERY_HANDLERS,
+    JwtStrategy,
   ],
   exports: [],
 })
-export class AuthModule {}
+export class AuthModule extends ConfigurableModuleClass {}

@@ -6,6 +6,7 @@ import { Token } from './dtos'
 import { JwtService } from '@nestjs/jwt'
 import { GetUserQuery } from './queries/contracts'
 import { ValidatePasswordCommand } from './commands/contracts'
+import { JwtPayload } from './types/jwt-payload.type'
 
 @Injectable()
 export class AuthService {
@@ -30,7 +31,7 @@ export class AuthService {
   }
 
   login(user: User): Token {
-    const payload = { email: user.email, sub: user.id }
+    const payload: JwtPayload = { email: user.email, sub: user.id }
     return {
       accessToken: this.jwtService.sign(payload),
     }
