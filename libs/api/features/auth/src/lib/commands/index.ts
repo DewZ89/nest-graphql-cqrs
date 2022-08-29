@@ -1,3 +1,11 @@
-import { ValidateUserHandler } from './handlers'
+import {
+  LoginHandler,
+  ValidatePasswordHandler,
+  ValidateUserHandler,
+} from './handlers'
 
-export const HANDLERS = [ValidateUserHandler]
+export const HANDLERS = [
+  ValidateUserHandler,
+  ValidatePasswordHandler,
+  LoginHandler,
+]

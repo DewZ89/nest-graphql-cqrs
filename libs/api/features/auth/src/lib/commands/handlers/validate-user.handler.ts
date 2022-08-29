@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { ValidateUserCommand } from '../contracts'
-import { AuthService } from '@blog/api/features/auth'
+import { AuthService } from '../../auth.service'
 import { User } from '@prisma/client'
 
 @CommandHandler(ValidateUserCommand)

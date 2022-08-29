@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { LoginInput } from './inputs/login.input'
-import { GetUserQuery, ValidatePasswordCommand } from '@blog/api/features/users'
 import { User } from '@prisma/client'
 import { Token } from './dtos'
 import { JwtService } from '@nestjs/jwt'
+import { GetUserQuery } from './queries/contracts'
+import { ValidatePasswordCommand } from './commands/contracts'
 
 @Injectable()
 export class AuthService {
@@ -16,12 +17,10 @@ export class AuthService {
 
   async validateUser(data: LoginInput): Promise<User | null> {
     try {
-      const user = await this.queryBus.execute(
-        new GetUserQuery({ email: data.email })
-      )
+      const user = await this.queryBus.execute(new GetUserQuery(data.email))
 
       return (await this.commandBus.execute(
-        new ValidatePasswordCommand(data.password, user.password)
+        new ValidatePasswordCommand(user.password, data.password)
       ))
         ? user
         : null

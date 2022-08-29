@@ -9,6 +9,7 @@ import {
 import { environment } from '../environments/environment'
 import { UsersModule } from '@blog/api/features/users'
 import { AuthModule } from '@blog/api/features/auth'
+import { PrismaModule } from '@blog/api/shared/prisma'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthModule } from '@blog/api/features/auth'
       resolvers: [scalarsResolvers],
       typeDefs: [...scalarsTypeDefs],
     }),
+    PrismaModule,
     UsersModule,
     AuthModule,
   ],

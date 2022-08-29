@@ -1,5 +1,5 @@
 type Mutation {
-  login(data: LoginInput): UserInfo
+  login(data: LoginInput): Token
 }
 
 type Token {
