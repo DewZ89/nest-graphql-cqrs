@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { LocalAuthGuard } from './guards/local-auth.guard'
+import { JwtGuard, LocalAuthGuard } from './guards'
 import { from, map, Observable } from 'rxjs'
 import { Token } from './dtos'
 import { CurrentUser } from './decorators'
@@ -9,7 +9,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { LoginCommand, RegisterCommand } from './commands/contracts'
 import { UserCreateInput, UserInfo } from '@blog/api/features/users'
 import { GetUserQuery } from './queries/contracts'
-import { JwtGuard } from './guards/jwt.guard'
 
 @Resolver()
 export class AuthResolver {
