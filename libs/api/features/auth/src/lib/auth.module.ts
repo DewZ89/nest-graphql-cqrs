@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { DynamicModule, Module } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { LocalStrategy } from './strategies/local.strategy'
 import { CqrsModule } from '@nestjs/cqrs'
@@ -10,28 +10,12 @@ import { JwtModule } from '@nestjs/jwt'
 import { UsersModule } from '@blog/api/features/users'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import {
-  ConfigurableModuleClass,
+  AuthModuleOptions,
   MODULE_OPTIONS_TOKEN,
-} from './auth.module-definition'
-import { AuthModuleOptions } from './types/auth-module-options.interface'
+} from './types/auth-module-options.interface'
 
 @Module({
-  imports: [
-    CqrsModule,
-    PassportModule,
-    JwtModule.registerAsync({
-      useFactory: (options: AuthModuleOptions) => {
-        return {
-          secret: options.jwtSecretKey,
-          signOptions: {
-            expiresIn: '1h',
-          },
-        }
-      },
-      inject: [MODULE_OPTIONS_TOKEN],
-    }),
-    UsersModule,
-  ],
+  imports: [CqrsModule, PassportModule, UsersModule],
   providers: [
     AuthService,
     LocalStrategy,
@@ -40,6 +24,25 @@ import { AuthModuleOptions } from './types/auth-module-options.interface'
     ...QUERY_HANDLERS,
     JwtStrategy,
   ],
-  exports: [],
+  exports: [AuthService],
 })
-export class AuthModule extends ConfigurableModuleClass {}
+export class AuthModule {
+  static register(options: AuthModuleOptions): DynamicModule {
+    return {
+      module: AuthModule,
+      imports: [
+        JwtModule.registerAsync({
+          useFactory: () => {
+            return {
+              secret: options.jwtSecretKey,
+              signOptions: {
+                expiresIn: '1h',
+              },
+            }
+          },
+        }),
+      ],
+      providers: [{ provide: MODULE_OPTIONS_TOKEN, useValue: options }],
+    }
+  }
+}

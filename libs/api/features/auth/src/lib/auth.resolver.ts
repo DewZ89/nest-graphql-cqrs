@@ -1,17 +1,22 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql'
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 import { LocalAuthGuard } from './guards/local-auth.guard'
-import { from, Observable } from 'rxjs'
+import { from, map, Observable } from 'rxjs'
 import { Token } from './dtos'
 import { CurrentUser } from './decorators'
 import { User } from '@prisma/client'
-import { CommandBus } from '@nestjs/cqrs'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { LoginCommand, RegisterCommand } from './commands/contracts'
-import { UserCreateInput } from '@blog/api/features/users'
+import { UserCreateInput, UserInfo } from '@blog/api/features/users'
+import { GetUserQuery } from './queries/contracts'
+import { JwtGuard } from './guards/jwt.guard'
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
+  ) {}
 
   @Mutation()
   @UseGuards(LocalAuthGuard)
@@ -22,5 +27,13 @@ export class AuthResolver {
   @Mutation()
   register(@Args('data') data: UserCreateInput): Observable<Token> {
     return from(this.commandBus.execute(new RegisterCommand(data)))
+  }
+
+  @Query('me')
+  @UseGuards(JwtGuard)
+  getCurrentUser(@CurrentUser() user: User): Observable<UserInfo> {
+    return from(this.queryBus.execute(new GetUserQuery(user.email))).pipe(
+      map((user) => new UserInfo(user))
+    )
   }
 }

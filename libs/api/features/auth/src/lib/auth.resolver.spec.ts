@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { AuthResolver } from './auth.resolver'
 import { DeepMockProxy, mockClear, mockDeep } from 'jest-mock-extended'
-import { CommandBus } from '@nestjs/cqrs'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { User } from '@prisma/client'
 import { Token } from './dtos'
 import { UserCreateInput } from '@blog/api/features/users'
 
 const commandBusMock = mockDeep<CommandBus>() as DeepMockProxy<CommandBus>
+const queryBusMock = mockDeep<QueryBus>() as DeepMockProxy<QueryBus>
 
 describe('AuthResolver', () => {
   let resolver: AuthResolver
@@ -16,6 +17,7 @@ describe('AuthResolver', () => {
       providers: [
         AuthResolver,
         { provide: CommandBus, useValue: commandBusMock },
+        { provide: QueryBus, useValue: queryBusMock },
       ],
     }).compile()
 
@@ -24,6 +26,7 @@ describe('AuthResolver', () => {
 
   beforeEach(() => {
     mockClear(commandBusMock)
+    mockClear(queryBusMock)
   })
 
   it('should be defined', () => {
@@ -60,6 +63,30 @@ describe('AuthResolver', () => {
       resolver.register(data).subscribe((result) => {
         expect(result).toEqual(token)
         expect(commandBusMock.execute).toHaveBeenCalledTimes(1)
+        done()
+      })
+    })
+  })
+
+  describe('me', () => {
+    it('should return current user info', (done) => {
+      // Given
+      const user: User = {
+        id: 1,
+        email: 'johndoe@example.com',
+        password: 'password',
+        createdAt: new Date(),
+        name: 'John Doe',
+      }
+      const expected = {
+        ...user,
+      } as User
+      queryBusMock.execute.mockResolvedValue(expected)
+
+      // When..Then
+      resolver.getCurrentUser(user).subscribe((result) => {
+        expect(result).toEqual(expected)
+        expect(queryBusMock.execute).toHaveBeenCalledTimes(1)
         done()
       })
     })

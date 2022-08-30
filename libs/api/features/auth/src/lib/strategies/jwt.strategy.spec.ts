@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { JwtStrategy } from './jwt.strategy'
 import { JwtPayload, ParsedJwtPayload } from '../types/jwt-payload.type'
-import { MODULE_OPTIONS_TOKEN } from '../auth.module-definition'
-import { AuthModuleOptions } from '../types/auth-module-options.interface'
+import {
+  AuthModuleOptions,
+  MODULE_OPTIONS_TOKEN,
+} from '../types/auth-module-options.interface'
 
 describe('JwtStrategy', () => {
   let provider: JwtStrategy
